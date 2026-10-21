@@ -6,7 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import HomeScreen from './screens/HomeScreen';
 import ListaScreen from './screens/ListaScreen';
-import DetalhesScreen from './screens/DetalhesScreens';
+import AgendamentosScreen from './screens/AgendamentosScreen';
 
 const Stack = createStackNavigator();
 
