@@ -1,59 +1,53 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { cores } from '../services/cores';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useAuth } from '../contexts/AuthContext';
+import { LUGARES, MAPA_PARQUE } from '../data/lugares';
 
 export default function HomeScreen({ navigation }) {
-    return (
-        <View style={styles.container}>
-            <Text style={styles.emoji}>🌳</Text>
-            <Text style={styles.titulo} accessibilityRole="header">
-                Parque Vivo
-            </Text>
+  const { usuario, sair } = useAuth();
 
-            <Text style={styles.texto}>
-                Bem-vindo ao Parque da Vila São João! Veja o mapa, encontre os espaços
-                acessíveis e agende a sua quadra de forma rápida e simples.
-            </Text>
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
+      <View style={styles.topo}>
+        <Text style={styles.ola}>Olá, {usuario.nomeUsuario}!</Text>
+        <TouchableOpacity onPress={sair}><Text style={styles.sair}>Sair</Text></TouchableOpacity>
+      </View>
 
-            {/* Botão principal: leva ao mapa (Tela 2) */}
-            <TouchableOpacity
-                style={styles.botao}
-                onPress={() => navigation.navigate('Lista')}
-                accessibilityRole="button"
-                accessibilityLabel="Ver Mapa"
-            >
-                <Text style={styles.textoBotao}>Ver Mapa</Text>
-            </TouchableOpacity>
+      <Image source={MAPA_PARQUE} style={styles.mapa} resizeMode="contain" />
 
-            <Text style={styles.rodape}>Protótipo · sem login</Text>
-        </View>
-    );
+      <Text style={styles.secao}>Escolha um local para agendar</Text>
+      {LUGARES.map((lugar) => (
+        <TouchableOpacity
+  key={lugar.id}
+  style={styles.card}
+  activeOpacity={0.85}
+  disabled={!lugar.agendavel}
+  onPress={() => lugar.agendavel && navigation.navigate('Agendamento', { lugar })}
+>
+          <Image source={lugar.imagem} style={styles.fachada} resizeMode="cover" />
+          <View style={styles.cardTexto}>
+            
+            <Text style={styles.cardNome}>{lugar.nome}</Text>
+            <Text style={styles.cardDescricao}>{lugar.descricao}</Text>
+            {lugar.agendavel && <Text style={styles.agendar}>Toque para agendar →</Text>}
+          </View>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: cores.fundo,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 28,
-    },
-    emoji: { fontSize: 72 },
-    titulo: { fontSize: 34, fontWeight: 'bold', color: cores.primaria, marginTop: 8 },
-    texto: {
-        fontSize: 17,
-        lineHeight: 25,
-        color: cores.texto,
-        textAlign: 'center',
-        marginVertical: 24,
-    },
-    botao: {
-        backgroundColor: cores.primaria,
-        paddingVertical: 16,
-        paddingHorizontal: 48,
-        borderRadius: 12,
-        minHeight: 48,
-    },
-    textoBotao: { color: cores.branco, fontSize: 18, fontWeight: 'bold' },
-    rodape: { position: 'absolute', bottom: 24, color: cores.textoSuave, fontSize: 12 },
+  container: { flex: 1, backgroundColor: '#F2F5F0' },
+  topo: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  ola: { fontSize: 18, fontWeight: '700', color: '#1B4332' },
+  sair: { color: '#2D6A4F', fontWeight: '700' },
+  mapa: { width: '1000%', aspectRatio: 1536 / 1024, borderRadius: 12, backgroundColor: '#fff' },
+  secao: { fontSize: 16, fontWeight: '800', color: '#1B4332', marginTop: 24, marginBottom: 12 },
+  card: { backgroundColor: '#fff', borderRadius: 14, marginBottom: 14, overflow: 'hidden', elevation: 2, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
+  fachada: { width: '100%', height: 150 },
+  cardTexto: { padding: 12 },
+  cardNome: { fontSize: 17, fontWeight: '800', color: '#1B4332' },
+  agendar: { marginTop: 6, fontSize: 13, fontWeight: '700', color: '#2D6A4F' },
+  cardDescricao: { fontSize: 13, color: '#555', marginTop: 2 },
 });
