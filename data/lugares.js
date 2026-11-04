@@ -11,4 +11,4 @@ export const LUGARES = [
   { id: 13, nome: 'Quiosque 5', agendavel: true, descricao: 'Área de descanso coberta', imagem: require('../assets/images/locais/Quiosques.jpeg') },
 ];
 
-export const MAPA_PARQUE = require('../assets/images/fachadas/mapa-parque-novo.png');
+export const MAPA_PARQUE = require('../assets/images/fachadas/Mapa-Novo.jpeg');
