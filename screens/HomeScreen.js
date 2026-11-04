@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   topo: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   ola: { fontSize: 18, fontWeight: '700', color: '#1B4332' },
   sair: { color: '#2D6A4F', fontWeight: '700' },
-  mapa: { width: '1000%', aspectRatio: 1536 / 1024, borderRadius: 12, backgroundColor: '#fff' },
+  mapa: { width: '100%', height: 220, borderRadius: 12, backgroundColor: '#fff' },
   secao: { fontSize: 16, fontWeight: '800', color: '#1B4332', marginTop: 24, marginBottom: 12 },
   card: { backgroundColor: '#fff', borderRadius: 14, marginBottom: 14, overflow: 'hidden', elevation: 2, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
   fachada: { width: '100%', height: 150 },

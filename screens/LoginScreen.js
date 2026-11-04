@@ -38,7 +38,7 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView style={styles.container} contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
-        <Image source={require('../assets/images/fachadas/chegada.jpg')} style={styles.banner} />
+        <Image source={require('../assets/images/fachadas/Entrada do Parque Urbano ao Entardecer (1).png')} style={styles.banner} />
         <Text style={styles.titulo}>Parque Urbano</Text>
         <Text style={styles.subtitulo}>Vila São João</Text>
 
