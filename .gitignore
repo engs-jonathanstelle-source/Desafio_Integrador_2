@@ -39,3 +39,8 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# API Spring Boot
+api/target/
+api/data/
+.env

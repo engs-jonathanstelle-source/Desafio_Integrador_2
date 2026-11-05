@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { criarAgendamento, listarPorLugar } from '../services/agendamentos';
+import { useAuth } from '../contexts/AuthContext';
 
 const HORARIOS = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
 const DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -38,16 +39,12 @@ const gerarDias = () => {
 
 export default function AgendamentoScreen({ route, navigation }) {
   const { lugar } = route.params;
+  const { usuario } = useAuth();
   const dias = useMemo(gerarDias, []);
 
   const [agendamentos, setAgendamentos] = useState([]);
   const [data, setData] = useState(null);
   const [hora, setHora] = useState(null);
-  const [nome, setNome] = useState('');
-  const [telefone, setTelefone] = useState('');
-  const [email, setEmail] = useState('');
-  const [pessoas, setPessoas] = useState('');
-  const [observacoes, setObservacoes] = useState('');
   const [salvando, setSalvando] = useState(false);
 
   const carregar = useCallback(async () => {
@@ -77,11 +74,6 @@ export default function AgendamentoScreen({ route, navigation }) {
   const validar = () => {
     if (!data) return 'Escolha o dia.';
     if (!hora) return 'Escolha o horário.';
-    if (nome.trim().length < 3) return 'Informe o nome completo.';
-    if (telefone.replace(/\D/g, '').length < 10) return 'Informe um telefone válido com DDD.';
-    if (!/^\S+@\S+\.\S+$/.test(email.trim())) return 'Informe um e-mail válido.';
-    const qtd = parseInt(pessoas, 10);
-    if (!qtd || qtd < 1) return 'Informe o número de pessoas.';
     return null;
   };
 
@@ -96,11 +88,9 @@ export default function AgendamentoScreen({ route, navigation }) {
         lugarNome: lugar.nome,
         data,
         hora,
-        nome: nome.trim(),
-        telefone: telefone.replace(/\D/g, ''),
-        email: email.trim().toLowerCase(),
-        pessoas: parseInt(pessoas, 10),
-        observacoes: observacoes.trim(),
+        usuarioId: usuario.id,
+        nomeUsuario: usuario.nomeUsuario,
+        email: usuario.email,
       });
       await carregar();
       Alert.alert('Agendado!', `${lugar.nome} reservado para ${formatarBR(data)} às ${hora}.`, [
@@ -167,53 +157,13 @@ export default function AgendamentoScreen({ route, navigation }) {
           </View>
         )}
 
-        <Text style={styles.label}>Nome completo</Text>
-        <TextInput style={styles.input} value={nome} onChangeText={setNome} placeholder="Seu nome" autoCapitalize="words" />
-
-        <Text style={styles.label}>Telefone (com DDD)</Text>
-        <TextInput
-          style={styles.input}
-          value={telefone}
-          onChangeText={setTelefone}
-          placeholder="(41) 99999-9999"
-          keyboardType="phone-pad"
-          maxLength={15}
-        />
-
-        <Text style={styles.label}>E-mail</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          placeholder="voce@email.com"
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <Text style={styles.label}>Número de pessoas</Text>
-        <TextInput
-          style={styles.input}
-          value={pessoas}
-          onChangeText={(t) => setPessoas(t.replace(/\D/g, ''))}
-          placeholder="Ex.: 10"
-          keyboardType="number-pad"
-          maxLength={3}
-        />
-
-        <Text style={styles.label}>Observações (opcional)</Text>
-        <TextInput
-          style={[styles.input, { height: 90, textAlignVertical: 'top' }]}
-          value={observacoes}
-          onChangeText={setObservacoes}
-          placeholder="Ex.: aniversário, evento de grupo..."
-          multiline
-        />
+        <Text style={styles.aviso}>Agendando como {usuario.nomeUsuario} ({usuario.email})</Text>
 
         <TouchableOpacity style={[styles.botao, salvando && { opacity: 0.6 }]} onPress={enviar} disabled={salvando}>
           <Text style={styles.botaoTexto}>{salvando ? 'Salvando...' : 'Confirmar agendamento'}</Text>
         </TouchableOpacity>
 
-        <Text style={[styles.label, { marginTop: 32 }]}>Agendamentos já feitos neste local</Text>
+        <Text style={[styles.label, { marginTop: 32 }]}>Agendamentos neste local</Text>
         {agendamentos.length === 0 ? (
           <Text style={styles.aviso}>Nenhum agendamento ainda. Seja o primeiro!</Text>
         ) : (
@@ -222,8 +172,7 @@ export default function AgendamentoScreen({ route, navigation }) {
               <Text style={styles.itemData}>
                 {formatarBR(a.data)} às {a.hora}
               </Text>
-              {/* Mostra só o primeiro nome para preservar a privacidade */}
-              <Text style={styles.itemNome}>Reservado por {a.nome.split(' ')[0]}</Text>
+              <Text style={styles.itemNome}>Reservado por {a.nomeUsuario}</Text>
             </View>
           ))
         )}

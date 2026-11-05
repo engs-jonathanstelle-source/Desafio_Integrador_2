@@ -1,38 +1,32 @@
-// Comunicação com a API de agendamentos.
-// Ajuste BASE_URL e os endpoints conforme a sua API.
-// No Android Emulator, localhost do computador é http://10.0.2.2:PORTA
-const BASE_URL = 'https://sua-api.com/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { USAR_API } from './config';
+import { requisicao } from './http';
 
-async function requisicao(caminho, opcoes = {}) {
-  const resposta = await fetch(`${BASE_URL}${caminho}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      // Authorization: `Bearer ${token}`, // se sua API exigir login
-    },
-    ...opcoes,
-  });
+const CHAVE = '@agendamentos';
 
-  // 409 = o horário já foi agendado por outra pessoa
-  if (resposta.status === 409) {
+// ---------- MODO LOCAL ----------
+const lerTodos = async () => JSON.parse((await AsyncStorage.getItem(CHAVE)) || '[]');
+
+const localListar = async (lugarId) => (await lerTodos()).filter((a) => a.lugarId === lugarId);
+
+const localCriar = async (ag) => {
+  const todos = await lerTodos();
+  if (todos.some((a) => a.lugarId === ag.lugarId && a.data === ag.data && a.hora === ag.hora)) {
     throw new Error('CONFLITO');
   }
-  if (!resposta.ok) {
-    throw new Error(`ERRO_API_${resposta.status}`);
-  }
-  return resposta.status === 204 ? null : resposta.json();
-}
+  const novo = { ...ag, id: Date.now() };
+  await AsyncStorage.setItem(CHAVE, JSON.stringify([...todos, novo]));
+  return novo;
+};
 
-// GET /agendamentos?lugarId=1
-// Deve retornar: [{ id, lugarId, data: 'AAAA-MM-DD', hora: 'HH:MM', nome, ... }]
-export function listarPorLugar(lugarId) {
-  return requisicao(`/agendamentos?lugarId=${encodeURIComponent(lugarId)}`);
-}
+// ---------- MODO API SPRING BOOT ----------
+// GET  /agendamentos?lugarId=1
+//   -> [{ id, lugarId, lugarNome, data:'AAAA-MM-DD', hora:'HH:MM', usuarioId, nomeUsuario, email }]
+// POST /agendamentos  body: { lugarId, lugarNome, data, hora, usuarioId, nomeUsuario, email }
+//   -> 201 com o agendamento, ou 409 se lugarId + data + hora já existir.
+//   (No Spring, o usuário também pode vir do token JWT em vez do body.)
+const apiListar = (lugarId) => requisicao(`/agendamentos?lugarId=${encodeURIComponent(lugarId)}`);
+const apiCriar = (ag) => requisicao('/agendamentos', { method: 'POST', body: JSON.stringify(ag) });
 
-// POST /agendamentos
-// Deve retornar 201 com o agendamento criado, ou 409 se lugarId + data + hora já existir.
-export function criarAgendamento(agendamento) {
-  return requisicao('/agendamentos', {
-    method: 'POST',
-    body: JSON.stringify(agendamento),
-  });
-}
+export const listarPorLugar = (lugarId) => (USAR_API ? apiListar(lugarId) : localListar(lugarId));
+export const criarAgendamento = (ag) => (USAR_API ? apiCriar(ag) : localCriar(ag));
