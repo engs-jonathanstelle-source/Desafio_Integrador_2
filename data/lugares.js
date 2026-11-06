@@ -11,7 +11,7 @@ export const LUGARES = [
   { id: 13, nome: 'Quiosque 5', agendavel: true, descricao: 'Área de descanso coberta', imagem: require('../assets/images/locais/Quiosques.jpeg') },
 ];
 
-export const MAPA_PARQUE = require('../assets/images/fachadas/Mapa-Novo.jpeg');
+export const MAPA_PARQUE = require('../assets/images/fachadas/mapa-novo3.jpg');
 
 // Foto de cada lugar pelo id (usado quando os lugares vêm da API, que não envia imagens)
 export const IMAGENS_POR_ID = Object.fromEntries(LUGARES.map((l) => [l.id, l.imagem]));

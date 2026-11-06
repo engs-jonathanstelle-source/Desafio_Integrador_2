@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { MAPA_PARQUE } from '../data/lugares';
 import { listarLugares } from '../services/lugares';
 
+const PLACA_LEGENDA = require('../assets/images/fachadas/placa.jpg');
+
 export default function HomeScreen({ navigation }) {
   const { usuario, sair } = useAuth();
   const [lugares, setLugares] = useState([]);
@@ -35,11 +37,21 @@ export default function HomeScreen({ navigation }) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
       <View style={styles.topo}>
-        <Text style={styles.ola}>Olá, {usuario.nomeUsuario}!</Text>
+        <Text style={styles.ola}>Olá, {usuario?.nomeUsuario}!</Text>
         <TouchableOpacity onPress={sair}><Text style={styles.sair}>Sair</Text></TouchableOpacity>
       </View>
 
-      <Image source={MAPA_PARQUE} style={styles.mapa} resizeMode="contain" />
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.mapaScroll}
+        contentContainerStyle={{ paddingHorizontal: 16 }}
+        nestedScrollEnabled
+      >
+        <Image source={MAPA_PARQUE} style={styles.mapa} resizeMode="cover" />
+      </ScrollView>
+
+      <Image source={PLACA_LEGENDA} style={styles.placa} resizeMode="contain" />
 
       <Text style={styles.secao}>Escolha um local para agendar</Text>
       {carregando && <ActivityIndicator size="large" color="#2D6A4F" style={{ marginTop: 24 }} />}
@@ -55,15 +67,15 @@ export default function HomeScreen({ navigation }) {
 
       {!carregando && !erro && lugares.map((lugar) => (
         <TouchableOpacity
-  key={lugar.id}
-  style={styles.card}
-  activeOpacity={0.85}
-  disabled={!lugar.agendavel}
-  onPress={() => lugar.agendavel && navigation.navigate('Agendamento', { lugar })}
->
+          key={lugar.id}
+          style={styles.card}
+          activeOpacity={0.85}
+          disabled={!lugar.agendavel}
+          onPress={() => lugar.agendavel && navigation.navigate('Agendamento', { lugar })}
+        >
           <Image source={lugar.imagem} style={styles.fachada} resizeMode="cover" />
           <View style={styles.cardTexto}>
-            
+
             <Text style={styles.cardNome}>{lugar.nome}</Text>
             <Text style={styles.cardDescricao}>{lugar.descricao}</Text>
             {lugar.agendavel && <Text style={styles.agendar}>Toque para agendar →</Text>}
@@ -79,7 +91,8 @@ const styles = StyleSheet.create({
   topo: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   ola: { fontSize: 18, fontWeight: '700', color: '#1B4332' },
   sair: { color: '#2D6A4F', fontWeight: '700' },
-  mapa: { width: '100%', height: 220, borderRadius: 12, backgroundColor: '#fff' },
+  mapaScroll: { marginHorizontal: -16 },
+  mapa: { width: 900, height: 316, borderRadius: 7 },
   secao: { fontSize: 16, fontWeight: '800', color: '#1B4332', marginTop: 24, marginBottom: 12 },
   card: { backgroundColor: '#fff', borderRadius: 14, marginBottom: 14, overflow: 'hidden', elevation: 2, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
   fachada: { width: '100%', height: 150 },
@@ -91,4 +104,5 @@ const styles = StyleSheet.create({
   erroTexto: { color: '#7A1F1F', fontSize: 14, textAlign: 'center', marginBottom: 12 },
   botaoErro: { backgroundColor: '#2D6A4F', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 18 },
   botaoErroTexto: { color: '#fff', fontWeight: '700' },
+  placa: { width: '70%', aspectRatio: 70 / 0, marginTop: -400, margin: -400, borderRadius: 12, alignSelf: 'center' },
 });
